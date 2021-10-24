@@ -1,0 +1,13 @@
+---
+
+- hosts: test
+  roles:
+    - weareinteractive.git
+    - weareinteractive.users_oh_my_zsh
+#  vars:
+#    users:
+#      - name: Foo Bar
+#        username: foobar
+#        authorized_keys: []
+#        oh_my_zsh:
+#          theme: supertheme

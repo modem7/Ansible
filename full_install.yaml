@@ -1,0 +1,4 @@
+---
+- import_playbook: add_public_keys.yaml
+- import_playbook: install_nettools.yaml
+- import_playbook: docker_install.yaml

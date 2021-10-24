@@ -1,0 +1,26 @@
+---
+- hosts: nodes
+
+  become: yes
+  tasks:
+
+   - name: To install NetData
+     apt:
+       name: ['git', 'zlib1g-dev', 'uuid-dev', 'libmnl-dev', 'pkg-config', 'curl', 'gcc', 'make', 'autoconf', 'autoconf-archive', 'autogen', 'automake', 'python3', 'python-yaml', 'python3-mysqldb', 'lm-sensors', 'python3-psycopg2', 'netcat', 'nodejs', 'libuv1-dev', 'zlib1g-dev']
+       update_cache: yes
+       state: present
+   - name:
+     git:
+       repo: 'https://github.com/firehol/netdata.git'
+       dest: /opt/netdata/
+       clone: yes
+       update: yes
+   - name: to run the shell script
+     shell: bash netdata-installer.sh --dont-wait --libs-are-really-here
+     args:
+       chdir: /opt/netdata
+  handlers:
+   - name: to restart netdata
+     service:
+       name: netdata
+       state: restarted

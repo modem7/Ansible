@@ -1,0 +1,41 @@
+---
+
+- hosts: test
+  become: yes
+
+  vars:
+    - default_users: ['nobody']
+    - required_users: ['badshah', 'bob', 'alice']
+
+  tasks:
+
+  - name: Get list of all users
+#    shell: "getent passwd | awk -F: '$3 >= 1000 && $1!=(nobody) {print $1}'"
+    shell: "getent passwd | awk -F: '$3 > 1000 {print $1}'"
+    changed_when: false
+    register: users
+
+  - name: Find home
+    find:
+       paths: /home
+       recurse: no
+       file_type: directory
+    register: homedir
+
+  - name: Create ASS directory
+    file:
+#       path: "{{ item.path }}/{{ users.stdout_lines }}/bigboobsinside"
+#       path: "{{ item.path }}/bigboobsinside"
+       path: "/home/{{ item }}/bigboobsinside"
+       state: directory
+    with_items: "{{ users.stdout_lines }}"
+#    with_items: "{{ homedir.files }}"
+    when: item not in default_users
+
+#  - name: Remove all users
+#    user:
+#      name: "{{ item }}"
+#      state: absent
+#      remove: yes
+#    with_items: "{{ users.stdout_lines }}"
+#    when: item not in default_users

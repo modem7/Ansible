@@ -1,0 +1,28 @@
+---
+- hosts: all
+
+  become: yes
+  tasks:
+
+  # Installs public key
+  # --
+  #
+  # TODO: Make sure you replace the current user and id_rsa.pub file
+  #       with your own credentials!
+  #
+  - name: install public keys
+    ansible.posix.authorized_key:
+      user: modem7
+      state: present
+      key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+  # (Optional)
+  # Set all sudoers to no password
+  # --
+  - name: change sudoers file
+    lineinfile:
+      path: /etc/sudoers
+      state: present
+      regexp: '^%sudo'
+      line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+      validate: /usr/sbin/visudo -cf %s
