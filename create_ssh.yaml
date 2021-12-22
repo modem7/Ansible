@@ -1,6 +1,6 @@
 ---
 - name: Exchange Keys between servers
-  hosts: nodes
+  hosts: teleport
   tasks:
     - name: SSH KeyGen command
       tags: run
@@ -24,4 +24,4 @@
         key: "{{ lookup('file','/tmp/{{ansible_hostname}}-id_rsa.pub')}}"
       when: "{{ item != ansible_hostname }}"
       with_items: 
-        - "{{ groups['nodes'] }}"   
+        - "{{ groups['teleport'] }}"   

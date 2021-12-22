@@ -4,8 +4,7 @@
   become: yes
 
   vars:
-    CTOP_VERSION: "0.7.6"
-    DOCKER_COMPOSE_VERSION: "1.27.4"
+    DOCKER_COMPOSE_VERSION: "1.29.2"
     USER: "modem7"
 
   tasks:
@@ -76,17 +75,11 @@
       groups: docker
       append: yes
 
-  - name: Install Docker Compose
-    get_url:
-      url: https://github.com/docker/compose/releases/download/{{ DOCKER_COMPOSE_VERSION }}/docker-compose-Linux-x86_64
-      dest: "/usr/local/bin/docker-compose"
-      mode: 0755
-
-  - name: Install Ctop
-    get_url:
-      url: https://github.com/bcicen/ctop/releases/download/{{ CTOP_VERSION }}/ctop-{{ CTOP_VERSION }}-linux-amd64
-      dest: "/usr/local/bin/ctop"
-      mode: 0755
+#  - name: Install Docker Compose
+#    get_url:
+#      url: https://github.com/docker/compose/releases/download/{{ DOCKER_COMPOSE_VERSION }}/docker-compose-Linux-x86_64
+#      dest: "/usr/local/bin/docker-compose"
+#      mode: 0755
 
   - name: Reboot server in order for changes to take place
     shell: "sleep 1 && reboot"
