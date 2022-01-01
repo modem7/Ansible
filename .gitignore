@@ -1,5 +1,2 @@
 private_keys/*
 !/private_keys/PutPrivateSSHKeysHere.txt
-public_keys/*
-!/private_keys/PutPublicSSHKeysHere.txt
-
