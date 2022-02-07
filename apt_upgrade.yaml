@@ -4,15 +4,12 @@
   become_user: root
   tasks:
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
-      register: updatesys
       apt: 
         update_cache: yes
         cache_valid_time: 3600
-        autoremove: yes
-        autoclean: yes
 
     - name: Upgrade all packages on servers
-      apt: upgrade=dist
+      apt: upgrade=safe
 
     - name: Check if a reboot is needed on all servers
       register: reboot_required_file
