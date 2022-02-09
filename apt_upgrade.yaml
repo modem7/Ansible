@@ -27,13 +27,9 @@
         test_command: uptime
       when: reboot_required_file.stat.exists
 
-#    - name: Autoremove packages on all Debian/Ubuntu boxes
-#      apt:
-#        force_apt_get: yes
-#        autoremove: yes
-#        autoclean: yes
-
     - name: Autoremove unused packages
-      command: apt-get -y autoremove
+      command: apt-get autoremove -y
       register: autoremove_output
       changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+      retries: 5
+      delay: 5
