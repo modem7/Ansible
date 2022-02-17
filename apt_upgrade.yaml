@@ -2,16 +2,27 @@
 - hosts: VM
   become: true
   become_user: root
+  gather_facts: false
   tasks:
+    - name: Wait for systems to become reachable
+      wait_for_connection:
+        timeout: 120
+
+    - name: Wait for cloud-init / user-data to finish
+      command: cloud-init status --wait
+      changed_when: false
+
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
-      apt: 
+      apt:
         update_cache: yes
         cache_valid_time: 3600
         autoremove: yes
         autoclean: yes
 
     - name: Upgrade all packages on servers
-      apt: upgrade=dist
+      apt:
+        upgrade: dist
+        lock_timeout: 120
 
     - name: Check if a reboot is needed on all servers
       register: reboot_required_file
