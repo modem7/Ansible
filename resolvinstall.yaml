@@ -1,0 +1,39 @@
+---
+
+- hosts: VM
+  become: true
+  become_user: root
+  gather_facts: false
+  tasks:
+    - name: Update apt packages
+      apt:
+        update_cache: "yes"
+        force_apt_get: "yes"
+
+    - name: Install a list of packages
+      apt:
+        pkg:
+          - resolvconf
+        state: present
+        force_apt_get: "yes" 
+
+    - name: Check if a reboot is needed on all servers
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+    - name: Autoremove unused packages
+      command: apt-get autoremove -y
+      register: autoremove_output
+      changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+      retries: 5
+      delay: 5
