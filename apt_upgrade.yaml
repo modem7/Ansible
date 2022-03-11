@@ -4,9 +4,9 @@
   become_user: root
   gather_facts: false
   tasks:
-#    - name: Wait for systems to become reachable
-#      wait_for_connection:
-#        timeout: 120
+    - name: Wait for systems to become reachable
+      wait_for_connection:
+        timeout: 120
 
     - name: Wait for cloud-init / user-data to finish
       command: cloud-init status --wait
