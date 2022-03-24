@@ -15,7 +15,8 @@
         pkg:
           - resolvconf
         state: present
-        force_apt_get: "yes" 
+        force_apt_get: "yes"
+        install_recommends: "no"
 
     - name: Check if a reboot is needed on all servers
       register: reboot_required_file
