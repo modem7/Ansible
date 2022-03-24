@@ -1,0 +1,8 @@
+---
+- hosts: VM
+  become: yes
+  tasks:
+    - name: install needrestart
+      apt:
+        name: needrestart
+        state: absent
