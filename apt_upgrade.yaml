@@ -1,6 +1,8 @@
 ---
+# ansible-vault encrypt_string --vault-password-file password/password_file 'mypasswordhere' --name 'prox_pass'
 - name: Set Variables
   gather_facts: false
+  hosts: proxmox
   tags: vars
   tasks:
     - name: Set Variables
@@ -13,15 +15,13 @@
           3630623534336533360a646436653837646432383166396435306232373863646531386237643832
           63373538396161383365626531396562373036666438646334626465366165623765383930623564
           3463633739376364373536373334633464333433303633666236
-    - tags:
-        - vars
 
-- name: Start and Update VMs
+- name: Start VMs
   gather_facts: false
   hosts: proxmox
   tags: startvm
   tasks:
-    - name: Start VMs
+    - name: Proxmox start VMs
       community.general.proxmox_kvm:
         api_user: "vmstartstop@pve"
         api_password: "{{ prox_pass }}"
@@ -41,12 +41,84 @@
         - 9001
         - 9002
 
+- name: Start Teleport
+  gather_facts: false
+  hosts: proxmox
+  tags: startteleport
+  tasks:
+    - name: Proxmox start Teleport
+      community.general.proxmox_kvm:
+        api_user: "vmstartstop@pve"
+        api_password: "{{ prox_pass }}"
+        api_host: "127.0.0.1"
+        node: "proxmox"
+        vmid: "{{ item }}"
+        state: "started"
+      loop:
+        - 1107
+        - 1108
+        - 1109
+        - 1110
+        - 1111
+        - 1112
+        - 1113
+
 - name: Update VMs
   become: true
   become_user: root
   gather_facts: false
   tags: updatevm
   hosts: VMnotele
+  serial: 10
+  tasks:
+    - name: Wait for systems to become reachable
+      wait_for_connection:
+        timeout: 120
+
+    - name: Wait for cloud-init / user-data to finish
+      command: cloud-init status --wait
+      changed_when: false
+
+    - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        autoremove: yes
+        autoclean: yes
+
+    - name: Upgrade all packages on servers
+      apt:
+        upgrade: dist
+        lock_timeout: 120
+
+    - name: Check if a reboot is needed on all servers
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+    - name: Autoremove unused packages
+      command: apt-get autoremove -y
+      register: autoremove_output
+      changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+      retries: 5
+      delay: 5
+
+- name: Update Teleport
+  become: true
+  become_user: root
+  gather_facts: false
+  hosts: teleport
+  tags: updateteleport
+  serial: 10
   tasks:
     - name: Wait for systems to become reachable
       wait_for_connection:
@@ -94,8 +166,9 @@
   gather_facts: false
   hosts: proxmox
   tags: stopvm
+  serial: 8
   tasks:
-    - name: Stop VMs
+    - name: Proxmox stop VMs
       community.general.proxmox_kvm:
         api_user: "vmstartstop@pve"
         api_password: "{{ prox_pass }}"
@@ -111,3 +184,26 @@
         - 9000
         - 9001
         - 9002
+
+- name: Stop Teleport
+  gather_facts: false
+  hosts: proxmox
+  tags: stopteleport
+  serial: 8
+  tasks:
+    - name: Proxmox stop Teleport
+      community.general.proxmox_kvm:
+        api_user: "vmstartstop@pve"
+        api_password: "{{ prox_pass }}"
+        api_host: "127.0.0.1"
+        node: "proxmox"
+        vmid: "{{ item }}"
+        state: "stopped"
+      loop:
+        - 1107
+        - 1108
+        - 1109
+        - 1110
+        - 1111
+        - 1112
+        - 1113
