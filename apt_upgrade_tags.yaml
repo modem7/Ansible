@@ -1,0 +1,113 @@
+---
+- name: Set Variables
+  gather_facts: false
+  tags: vars
+  tasks:
+    - name: Set Variables
+      set_fact:
+        prox_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37613964646237366230396366613664616433623663306133383031343964643039623537313936
+          3234336333306137636339653538353636623432653638330a656664633462323130356530653837
+          61363432313732363366396431393434333936303438623934366463646233326531303433653038
+          3630623534336533360a646436653837646432383166396435306232373863646531386237643832
+          63373538396161383365626531396562373036666438646334626465366165623765383930623564
+          3463633739376364373536373334633464333433303633666236
+    - tags:
+        - vars
+
+- name: Start and Update VMs
+  gather_facts: false
+  hosts: proxmox
+  tags: startvm
+  tasks:
+    - name: Start VMs
+      community.general.proxmox_kvm:
+        api_user: "vmstartstop@pve"
+        api_password: "{{ prox_pass }}"
+        api_host: "127.0.0.1"
+        node: "proxmox"
+        vmid: "{{ item }}"
+        state: "started"
+      loop:
+        - 1101
+        - 1103
+        - 1104
+        - 1105
+        - 1106
+        - 1254
+        - 2206
+        - 9000
+        - 9001
+        - 9002
+
+- name: Update VMs
+  become: true
+  become_user: root
+  gather_facts: false
+  tags: updatevm
+  hosts: VMnotele
+  tasks:
+    - name: Wait for systems to become reachable
+      wait_for_connection:
+        timeout: 120
+
+    - name: Wait for cloud-init / user-data to finish
+      command: cloud-init status --wait
+      changed_when: false
+
+    - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        autoremove: yes
+        autoclean: yes
+
+    - name: Upgrade all packages on servers
+      apt:
+        upgrade: dist
+        lock_timeout: 120
+
+    - name: Check if a reboot is needed on all servers
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+    - name: Autoremove unused packages
+      command: apt-get autoremove -y
+      register: autoremove_output
+      changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+      retries: 5
+      delay: 5
+
+- name: Stop VMs
+  become: true
+  gather_facts: false
+  hosts: proxmox
+  tags: stopvm
+  tasks:
+    - name: Stop VMs
+      community.general.proxmox_kvm:
+        api_user: "vmstartstop@pve"
+        api_password: "{{ prox_pass }}"
+        api_host: "127.0.0.1"
+        node: "proxmox"
+        vmid: "{{ item }}"
+        state: "stopped"
+      loop:
+        - 1101
+        - 1106
+        - 1254
+        - 2206
+        - 9000
+        - 9001
+        - 9002
