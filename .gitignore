@@ -1,3 +1,4 @@
 private_keys/*
 !/private_keys/PutPrivateSSHKeysHere.txt
 password/*
+!/password/PutPasswordsHere.txt
