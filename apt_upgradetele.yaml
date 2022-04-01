@@ -26,31 +26,6 @@
           33373137386535623134313033393230663562336430623062663936386633656263383966346665
           6430656661646163353535353339373739396366626432643433
 
-- name: Start VMs
-  gather_facts: false
-  hosts: proxmox
-  tags: startvm
-  tasks:
-    - name: Proxmox start VMs
-      community.general.proxmox_kvm:
-        api_user: "{{ prox_user }}"
-        api_password: "{{ prox_pass }}"
-        api_host: "127.0.0.1"
-        node: "proxmox"
-        vmid: "{{ item }}"
-        state: "started"
-      loop:
-        - 1101
-        - 1103
-        - 1104
-        - 1105
-        - 1106
-        - 1254
-        - 2206
-        - 9000
-        - 9001
-        - 9002
-
 - name: Start Teleport
   gather_facts: false
   hosts: proxmox
@@ -73,55 +48,6 @@
         - 1112
         - 1113
 
-- name: Update VMs
-  become: true
-  become_user: root
-  gather_facts: false
-  tags: updatevm
-  hosts: VMnotele
-  serial: 10
-  tasks:
-    - name: Wait for systems to become reachable
-      wait_for_connection:
-        timeout: 120
-
-    - name: Wait for cloud-init / user-data to finish
-      command: cloud-init status --wait
-      changed_when: false
-
-    - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-        autoremove: yes
-        autoclean: yes
-
-    - name: Upgrade all packages on servers
-      apt:
-        upgrade: dist
-        lock_timeout: 120
-
-    - name: Check if a reboot is needed on all servers
-      register: reboot_required_file
-      stat: path=/var/run/reboot-required get_md5=no
-
-    - name: Reboot the box if kernel updated
-      reboot:
-        msg: "Reboot initiated by Ansible for kernel updates"
-        connect_timeout: 5
-        reboot_timeout: 300
-        pre_reboot_delay: 0
-        post_reboot_delay: 30
-        test_command: uptime
-      when: reboot_required_file.stat.exists
-
-    - name: Autoremove unused packages
-      command: apt-get autoremove -y
-      register: autoremove_output
-      changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
-      retries: 5
-      delay: 5
-
 - name: Update Teleport
   become: true
   become_user: root
@@ -130,25 +56,40 @@
   tags: updateteleport
   serial: 10
   tasks:
-    - name: Wait for systems to become reachable
-      wait_for_connection:
-        timeout: 120
+#    - name: Wait for systems to become reachable
+#      wait_for_connection:
+#        timeout: 120
 
     - name: Wait for cloud-init / user-data to finish
       command: cloud-init status --wait
       changed_when: false
+      no_log: true
 
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
       apt:
         update_cache: yes
         cache_valid_time: 3600
-        autoremove: yes
         autoclean: yes
+
+    - name: Get packages that need upgrading
+      no_log: true
+      shell: apt-get -s --no-download dist-upgrade -V | grep '=>' | awk '{print$1}'
+      #shell: apt-get -V --no-download -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
+      register: updates
+    - name: Show packages that need upgrading
+      debug: msg={{ updates.stdout.split('\n')[:-1] }}
+      when: updates.stdout | length > 0
 
     - name: Upgrade all packages on servers
       apt:
-        upgrade: dist
+        upgrade: yes
         lock_timeout: 120
+      register: apt_result
+      no_log: true
+
+    - name: Check and report if updates got installed
+      debug: msg="{{ apt_result.stdout_lines }}"
+      when: apt_result.stdout.find('0 packages upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
 
     - name: Check if a reboot is needed on all servers
       register: reboot_required_file
@@ -165,41 +106,27 @@
       when: reboot_required_file.stat.exists
 
     - name: Autoremove unused packages
-      command: apt-get autoremove -y
-      register: autoremove_output
-      changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
-      retries: 5
-      delay: 5
+      apt:
+        autoremove: yes
+      register: apt_remove_result
+      changed_when: apt_remove_result.stdout.find('0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
+      no_log: true
 
-- name: Stop VMs
-  become: true
-  gather_facts: false
-  hosts: proxmox
-  tags: stopvm
-  serial: 8
-  tasks:
-    - name: Proxmox stop VMs
-      community.general.proxmox_kvm:
-        api_user: "vmstartstop@pve"
-        api_password: "{{ prox_pass }}"
-        api_host: "127.0.0.1"
-        node: "proxmox"
-        vmid: "{{ item }}"
-        state: "stopped"
-      loop:
-        - 1101
-        - 1106
-        - 1254
-        - 2206
-        - 9000
-        - 9001
-        - 9002
+    - name: Load removed package names
+      set_fact:
+        pkg_removed: "{{ apt_remove_result.stdout_lines|
+                         select('regex', '^Removing (.*)$')|
+                         map('regex_replace', '^(.*?) (.*?) (.*)$', '\\2')|
+                         list }}"
+    - name: Were any packages removed
+      debug:
+        var: pkg_removed
+      when: apt_remove_result.stdout.find('0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
 
 - name: Stop Teleport
   gather_facts: false
   hosts: proxmox
   tags: stopteleport
-  serial: 8
   tasks:
     - name: Proxmox stop Teleport
       community.general.proxmox_kvm:
@@ -217,3 +144,13 @@
         - 1111
         - 1112
         - 1113
+
+#- name: Shutdown Teleport
+#  gather_facts: false
+#  hosts: teleport
+#  tags: stopteleport
+#  tasks:
+#    - name: Shutdown Teleport VM's
+#      community.general.shutdown:
+#        msg: "Shutdown initiated by Ansible post updates"
+#        delay: 0
