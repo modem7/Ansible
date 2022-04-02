@@ -62,7 +62,7 @@
   become_user: root
   gather_facts: false
   hosts: VMnotele
-  tags: updateteleport
+  tags: updatevm
   serial: 10
   tasks:
     - name: Wait for systems to become reachable
@@ -82,8 +82,8 @@
 
     - name: Get packages that need upgrading
       no_log: true
-      shell: apt-get -s --no-download dist-upgrade -V | grep '=>' | awk '{print$1}'
-      #shell: apt-get -V --no-download -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
+      shell: apt-get -s dist-upgrade -V | grep '=>' | awk '{print$1}'
+      #shell: apt-get -V -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
       register: updates
     - name: Show packages that need upgrading
       debug: msg={{ updates.stdout.split('\n')[:-1] }}
@@ -208,8 +208,8 @@
 
     - name: Get packages that need upgrading
       no_log: true
-      shell: apt-get -s --no-download dist-upgrade -V | grep '=>' | awk '{print$1}'
-      #shell: apt-get -V --no-download -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
+      shell: apt-get -s dist-upgrade -V | grep '=>' | awk '{print$1}'
+      #shell: apt-get -V -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
       register: updates
     - name: Show packages that need upgrading
       debug: msg={{ updates.stdout.split('\n')[:-1] }}
