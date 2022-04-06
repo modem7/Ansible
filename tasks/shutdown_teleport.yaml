@@ -1,0 +1,17 @@
+---
+    - name: Proxmox stop Teleport
+      community.general.proxmox_kvm:
+        api_user: "{{ prox_user }}"
+        api_password: "{{ prox_pass }}"
+        api_host: "127.0.0.1"
+        node: "proxmox"
+        vmid: "{{ item }}"
+        state: "stopped"
+      loop:
+        - 1107
+        - 1108
+        - 1109
+        - 1110
+        - 1111
+        - 1112
+        - 1113
