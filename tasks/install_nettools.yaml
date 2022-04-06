@@ -1,0 +1,9 @@
+---
+    - name: Install a list of packages
+      apt:
+        pkg:
+          - net-tools
+        state: present
+        force_apt_get: "yes"
+        update_cache: "yes"
+        install_recommends: "no"

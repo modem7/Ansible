@@ -1,0 +1,11 @@
+---
+    - name: Trim all filesystems
+      command:
+        argv:
+          - fstrim -av
+
+    - name: "Start & Enable fstrim Timer"
+      service:
+        name: "fstrim.timer"
+        state: "started"
+        enabled: true
