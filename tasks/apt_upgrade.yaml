@@ -19,6 +19,7 @@
       shell: apt-get -s dist-upgrade -V | grep '=>' | awk '{print$1}'
       #shell: apt-get -V -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
       register: updates
+
     - name: Show packages that need upgrading
       debug: msg={{ updates.stdout.split('\n')[:-1] }}
       when: updates.stdout | length > 0
