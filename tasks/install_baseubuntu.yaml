@@ -12,6 +12,12 @@
           - htop
           - net-tools
           - dnsutils
+          - aptitude
+          - tldr
+          - tuned
+          - tuned-utils
+          - tuned-utils-systemtap
+          - needrestart
         state: present
         force_apt_get: "yes"
         update_cache: "yes"
