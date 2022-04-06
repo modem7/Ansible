@@ -1,5 +1,5 @@
 ---
-   - name: Proxmox start VMs
+    - name: Proxmox start VMs
       community.general.proxmox_kvm:
         api_user: "{{ prox_user }}"
         api_password: "{{ prox_pass }}"
