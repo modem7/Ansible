@@ -1,4 +1,4 @@
 private_keys/*
-!/private_keys/PutPrivateSSHKeysHere.txt
+!/private_keys/.keep
 password/*
-!/password/PutPasswordsHere.txt
+!/password/.keep
