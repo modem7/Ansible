@@ -14,15 +14,25 @@
         cache_valid_time: 3600
         autoclean: yes
 
-    - name: Get packages that need upgrading
-      no_log: true
-      shell: apt-get -s dist-upgrade -V | grep '=>' | awk '{print$1}'
-      #shell: apt-get -V -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
+    - name: List packages to upgrade (1/2)
+      shell: aptitude -q -F%p --disable-columns search ~U
       register: updates
+      changed_when: False
+      failed_when: updates.rc not in [0, 1]
 
-    - name: Show packages that need upgrading
-      debug: msg={{ updates.stdout.split('\n')[:-1] }}
-      when: updates.stdout | length > 0
+    - name: List packages to upgrade (2/2)
+      debug: msg="{{ updates.stdout_lines | count }} packages to upgrade ({{ updates.stdout_lines | join(', ') }})"
+      when: updates.stdout_lines
+
+    # - name: Get packages that need upgrading
+      # no_log: true
+      # shell: apt-get -s dist-upgrade -V | grep '=>' | awk '{print$1}'
+      # #shell: apt-get -V -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
+      # register: updates
+
+    # - name: Show packages that need upgrading
+      # debug: msg={{ updates.stdout.split('\n') }}
+      # when: updates.stdout | length > 0
 
     - name: Upgrade all packages on servers
       apt:
