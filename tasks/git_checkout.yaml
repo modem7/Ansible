@@ -1,0 +1,12 @@
+---
+    - name: checkout git repo
+      become_user: modem7
+      ansible.builtin.git:
+        repo: "{{ repo }}"
+        version: "master"
+        dest: "{{ dest }}"
+        key_file: "{{ sshkey }}"
+        accept_hostkey: yes
+        update: yes
+        clone: no
+        # single_branch: yes

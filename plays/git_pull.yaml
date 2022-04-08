@@ -1,0 +1,29 @@
+---
+#Set Variables
+- name: Set Variables
+  hosts: localhost
+  gather_facts: no
+  vars:
+    repo: "ssh://git@ssh.github.com:443/modem7/Ansible.git"
+    dest: "/home/modem7/ansible/ansiblegitest"
+    sshkey: "/home/modem7/ansible/private_keys/gitansible"
+  tasks:
+
+#Make sure Git is installed
+    - name: Make sure Git is installed
+      become: 'yes'
+      package:
+        name: git
+        state: present
+
+#Git Checkout
+    - name: checkout git repo
+      ansible.builtin.git:
+        repo: "{{ repo }}"
+        version: "master"
+        dest: "{{ dest }}"
+        key_file: "{{ sshkey }}"
+        accept_hostkey: yes
+        update: yes
+        clone: yes
+        single_branch: yes

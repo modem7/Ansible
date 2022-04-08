@@ -1,0 +1,15 @@
+---
+#Set Variables
+- name: Set Variables
+  hosts: localhost
+  gather_facts: no
+  vars:
+    repo_user: modem7
+    repo_name: Ansible
+    repo: "ssh://git@ssh.github.com:443/{{ repo_user }}/{{ repo_name }}.git"
+    dest: "~/{{ repo_name }}"
+    sshkey: "~/ansible/private_keys/gitansible"
+  tasks:
+
+#Git Checkout
+    - include_tasks: ../tasks/git_checkout.yaml
