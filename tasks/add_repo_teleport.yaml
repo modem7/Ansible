@@ -5,7 +5,7 @@
         dest: /usr/share/keyrings/teleport-archive-keyring.asc
         checksum: sha256:58958584ca95d311f8b040b010259c7a92cf97e7f0bc850793564c576812eef5 # curl -sL https://deb.releases.teleport.dev/teleport-pubkey.asc|sha256sum
 
-    - name: Add Teleport sources
+    - name: Add Teleport repo
       apt_repository:
         filename: teleport
         repo: deb https://deb.releases.teleport.dev/ stable main

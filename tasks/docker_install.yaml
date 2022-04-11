@@ -1,0 +1,77 @@
+---
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: "Remove old Docker versions"
+      apt: 
+        pkg:
+          - docker
+          - docker-engine
+          - docker.io
+          - containerd
+          - runc
+        state: absent
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+=========
+
+    - name: Download Docker gpg key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /tmp/docker-archive-keyring.gpg
+        checksum: sha256:1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570 # curl -sL https://download.docker.com/linux/ubuntu/gpg|sha256sum
+
+    - name: De-Armor Docker GPG key
+      command:  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      changed_when: false
+      no_log: true
+
+#https://git.deuxfleurs.fr/Deuxfleurs/infrastructure/commit/7852eef5a6d0eefc5914f178549f6845857a5c49?style=unified&whitespace=ignore-change
+====================
+    - name: Add Docker Repository
+      apt_repository:
+        filename: docker
+        repo: deb https://download.docker.com/linux/ubuntu/ focal stable
+        update_cache: yes
+        state: present
+        
+    - name: Update apt and install docker-ce
+      apt:
+        pkg: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Pull default Docker image
+      community.docker.docker_image:
+        name: "{{ default_container_image }}"
+        source: pull
+
+    - name: Create default containers
+      community.docker.docker_container:
+        name: "{{ default_container_name }}{{ item }}"
+        image: "{{ default_container_image }}"
+        command: "{{ default_container_command }}"
+        state: present
+      with_sequence: count={{ container_count }}
