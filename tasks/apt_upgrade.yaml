@@ -22,7 +22,7 @@
       failed_when: updates.rc not in [0, 1]
 
     - name: List packages to upgrade (2/2)
-      debug: msg="{{ updates.stdout_lines | count }} packages to upgrade ({{ updates.stdout_lines.split('\n') | join(', ') }})"
+      debug: msg="{{ updates.stdout_lines | count }} packages to upgrade ({{ updates.stdout_lines | join(', ') }})"
       when: updates.stdout_lines
 
     # - name: Get packages that need upgrading
