@@ -18,6 +18,7 @@
       shell: aptitude -q -F%p --disable-columns search ~U
       register: updates
       changed_when: False
+      no_log: true
       failed_when: updates.rc not in [0, 1]
 
     - name: List packages to upgrade (2/2)
