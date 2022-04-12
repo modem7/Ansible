@@ -25,16 +25,6 @@
       debug: msg="{{ updates.stdout_lines | count }} packages to upgrade ({{ updates.stdout_lines | join(', ') }})"
       when: updates.stdout_lines
 
-    # - name: Get packages that need upgrading
-      # no_log: true
-      # shell: apt-get -s dist-upgrade -V | grep '=>' | awk '{print$1}'
-      # #shell: apt-get -V -s dist-upgrade | grep "^  .*" | cut -d"(" -f1
-      # register: updates
-
-    # - name: Show packages that need upgrading
-      # debug: msg={{ updates.stdout.split('\n') }}
-      # when: updates.stdout | length > 0
-
     - name: Upgrade all packages on servers
       apt:
         upgrade: yes
@@ -42,9 +32,18 @@
       register: apt_result
       no_log: true
 
+    # - name: Check and report if updates got installed
+      # debug: msg="{{ apt_result.stdout_lines }}"
+      # when: apt_result.stdout.find('0 packages upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
+
     - name: Check and report if updates got installed
-      debug: msg="{{ apt_result.stdout_lines }}"
-      when: apt_result.stdout.find('0 packages upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
+      shell: grep -A 30 "$(date +"%a, %b %d %Y")" /var/log/aptitude
+      register: grepaptitude
+      no_log: true
+
+    - name: List upgraded packages
+      debug: msg="{{ grepaptitude.stdout_lines }}"
+      when: grepaptitude.stdout.find('Will install 0 packages, and remove 0 packages.') == -1
 
     - name: Check if a reboot is needed on all servers
       register: reboot_required_file
