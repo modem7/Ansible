@@ -38,6 +38,7 @@
 
     - name: Check and report if updates got installed
       shell: grep -A 30 "$(date +"%a, %b %d %Y")" /var/log/aptitude
+      changed_when: False
       register: grepaptitude
       no_log: true
 
