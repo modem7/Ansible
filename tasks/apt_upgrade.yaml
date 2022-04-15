@@ -25,7 +25,7 @@
       debug: msg="{{ updates.stdout_lines | count }} packages to upgrade ({{ updates.stdout_lines | join(', ') }})"
       when: updates.stdout_lines
 
-    - name: Skip if there are no updates
+    - name: Skip rest of tasks if there are no updates
       when: updates.stdout_lines
       block: 
         - name: Upgrade all packages on servers
