@@ -14,66 +14,65 @@
         cache_valid_time: 3600
         autoclean: yes
 
-    - name: List packages to upgrade (1/2)
+    - name: Collect packages to upgrade
       shell: aptitude -q -F%p --disable-columns search ~U
       register: updates
       changed_when: False
       no_log: true
       failed_when: updates.rc not in [0, 1]
 
-    - name: List packages to upgrade (2/2)
+    - name: List packages to upgrade
       debug: msg="{{ updates.stdout_lines | count }} packages to upgrade ({{ updates.stdout_lines | join(', ') }})"
       when: updates.stdout_lines
 
-    - name: Upgrade all packages on servers
-      apt:
-        upgrade: yes
-        lock_timeout: 120
-      register: apt_result
-      no_log: true
+    - name: Skip if there are no updates
+      when: updates.stdout_lines
+      block: 
+        - name: Upgrade all packages on servers
+          apt:
+            upgrade: yes
+            lock_timeout: 120
+          register: apt_result
+          no_log: true
 
-    # - name: Check and report if updates got installed
-      # debug: msg="{{ apt_result.stdout_lines }}"
-      # when: apt_result.stdout.find('0 packages upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
+        - name: Check and report if updates got installed
+          shell: grep -A 30 "$(date +"%a, %b %d %Y")" /var/log/aptitude
+          changed_when: False
+          register: grepaptitude
+          no_log: true
 
-    - name: Check and report if updates got installed
-      shell: grep -A 30 "$(date +"%a, %b %d %Y")" /var/log/aptitude
-      changed_when: False
-      register: grepaptitude
-      no_log: true
+        - name: List upgraded packages
+          debug: msg="{{ grepaptitude.stdout_lines }}"
+          when: grepaptitude.stdout.find('Will install 0 packages, and remove 0 packages.') == -1
 
-    - name: List upgraded packages
-      debug: msg="{{ grepaptitude.stdout_lines }}"
-      when: grepaptitude.stdout.find('Will install 0 packages, and remove 0 packages.') == -1
+        - name: Check if a reboot is needed on all servers
+          register: reboot_required_file
+          stat: path=/var/run/reboot-required get_md5=no
 
-    - name: Check if a reboot is needed on all servers
-      register: reboot_required_file
-      stat: path=/var/run/reboot-required get_md5=no
+        - name: Reboot the box if kernel updated
+          reboot:
+            msg: "Reboot initiated by Ansible for kernel updates"
+            connect_timeout: 5
+            reboot_timeout: 300
+            pre_reboot_delay: 0
+            post_reboot_delay: 30
+            test_command: uptime
+          when: reboot_required_file.stat.exists
 
-    - name: Reboot the box if kernel updated
-      reboot:
-        msg: "Reboot initiated by Ansible for kernel updates"
-        connect_timeout: 5
-        reboot_timeout: 300
-        pre_reboot_delay: 0
-        post_reboot_delay: 30
-        test_command: uptime
-      when: reboot_required_file.stat.exists
+        - name: Autoremove unused packages
+          apt:
+            autoremove: yes
+          register: apt_remove_result
+          changed_when: apt_remove_result.stdout.find('0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
+          no_log: true
 
-    - name: Autoremove unused packages
-      apt:
-        autoremove: yes
-      register: apt_remove_result
-      changed_when: apt_remove_result.stdout.find('0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
-      no_log: true
-
-    - name: Load removed package names
-      set_fact:
-        pkg_removed: "{{ apt_remove_result.stdout_lines|
-                         select('regex', '^Removing (.*)$')|
-                         map('regex_replace', '^(.*?) (.*?) (.*)$', '\\2')|
-                         list }}"
-    - name: Were any packages removed
-      debug:
-        var: pkg_removed
-      when: apt_remove_result.stdout.find('0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
+        - name: Load removed package names
+          set_fact:
+            pkg_removed: "{{ apt_remove_result.stdout_lines|
+                             select('regex', '^Removing (.*)$')|
+                             map('regex_replace', '^(.*?) (.*?) (.*)$', '\\2')|
+                             list }}"
+        - name: Were any packages removed
+          debug:
+            var: pkg_removed
+          when: apt_remove_result.stdout.find('0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.') == -1
