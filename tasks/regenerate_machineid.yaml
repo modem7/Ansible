@@ -1,11 +1,12 @@
 ---
-    - name: remove /etc/machine-id
+    - name: Remove /etc/machine-id and /var/lib/dbus/machine-id
       file:
-        path: /etc/machine-id
+        path: "{{ item }}"
         state: absent
-    - name: remove /var/lib/dbus/machine-id
-      file:
-        path: /var/lib/dbus/machine-id
-        state: absent
-    - name: generate new machine-id
+      with_items:
+        - /etc/machine-id
+        - /var/lib/dbus/machine-id
+
+    - name: Generate new machine-id
       command: systemd-machine-id-setup
+# sudo rm -rf /etc/machine-id /var/lib/dbus/machine-id && sudo systemd-machine-id-setup && sudo reboot now

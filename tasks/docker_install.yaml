@@ -1,56 +1,67 @@
 ---
-    - name: Install aptitude
-      apt:
-        name: aptitude
-        state: latest
-        update_cache: true
-
-    - name: "Remove old Docker versions"
-      apt: 
-        pkg:
+    - name: Remove old Docker versions
+      package: 
+        name:
           - docker
           - docker-engine
           - docker.io
           - containerd
           - runc
         state: absent
+        purge: true
 
-    - name: Install required system packages
-      apt:
-        pkg:
+    - name: Ensure dependencies are installed.
+      package:
+        name:
           - apt-transport-https
           - ca-certificates
           - curl
           - software-properties-common
           - python3-pip
           - virtualenv
+          - lsb-release
           - python3-setuptools
-        state: latest
+        state: present
         update_cache: true
 
-=========
+    - name: Ensure additional dependencies are installed (on Ubuntu < 20.04 and any other systems).
+      package:
+        name: gnupg2
+        state: present
+      when: ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('20.04', '<')
+
+    - name: Ensure additional dependencies are installed (on Ubuntu >= 20.04).
+      package:
+        name: gnupg
+        state: present
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution_version is version('20.04', '>=')
+
+    - name: Remove gpg keys if they exist #otherwise GPG doesn't run if file already exists
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /usr/share/keyrings/docker-archive-keyring.gpg
+        - /usr/share/keyrings/docker-archive-keyring.gpg_armored
 
     - name: Download Docker gpg key
       get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
-        dest: /tmp/dockergpg
+        dest: /usr/share/keyrings/docker-archive-keyring.gpg_armored
         checksum: sha256:1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570 # curl -sL https://download.docker.com/linux/ubuntu/gpg|sha256sum
 
     - name: De-Armor Docker GPG key
-      shell:  gpg --batch --no-tty < /tmp/dockergpg > /usr/share/keyrings/docker-archive-keyring.gpg
-      changed_when: false
-      no_log: true
+      shell: gpg --dearmor < /usr/share/keyrings/docker-archive-keyring.gpg_armored > /usr/share/keyrings/docker-archive-keyring.gpg
+      # no_log: true
+      args:
+        creates: /usr/share/keyrings/docker-archive-keyring.gpg
 
-#https://git.deuxfleurs.fr/Deuxfleurs/infrastructure/src/commit/7852eef5a6d0eefc5914f178549f6845857a5c49/os/config/roles/common/tasks/docker.yml
-====================
-    # Add Docker's repository to apt
-    # $ echo \
-    #   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
-    #   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    - name: "Add Docker's repository to APT sources list"
-      ansible.builtin.apt_repository:
-        repo: "deb [arch={{ architecture_map[ansible_architecture] }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+      #https://git.deuxfleurs.fr/Deuxfleurs/infrastructure/src/commit/7852eef5a6d0eefc5914f178549f6845857a5c49/os/config/roles/common/tasks/docker.yml
+    - name: Add Docker's repository to APT sources list
+      apt_repository:
+        repo: "deb [arch={{ architecture_map[ansible_architecture] }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         state: present
+        update_cache: true        
       vars:
         architecture_map:
           "x86_64": "amd64"
@@ -58,20 +69,23 @@
           "aarch": "arm64"
           "armhf": "armhf"
           "armv7l": "armhf"
-        
-    - name: Update apt and install docker-ce
-      apt:
-        pkg: 
+
+    - name: Install Docker engine
+      package:
+        name: 
           - docker-ce
           - docker-ce-cli
           - containerd.io
-        state: latest
-        update_cache: true
+        state: present
 
-    # Install docker-compose 
+    - name: Remove old docker compose
+      file:
+        path: /usr/local/bin/docker-compose
+        state: absent
+
     # $ sudo curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     - name: "Install Docker Compose"
-      ansible.builtin.get_url:
+      get_url:
         url: "https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
         dest: /usr/local/bin/docker-compose
         mode: "0755"
@@ -82,16 +96,3 @@
     - name: Install Docker Module for Python
       pip:
         name: docker
-
-    - name: Pull default Docker image
-      community.docker.docker_image:
-        name: "{{ default_container_image }}"
-        source: pull
-
-    - name: Create default containers
-      community.docker.docker_container:
-        name: "{{ default_container_name }}{{ item }}"
-        image: "{{ default_container_image }}"
-        command: "{{ default_container_command }}"
-        state: present
-      with_sequence: count={{ container_count }}

@@ -3,7 +3,6 @@
   hosts: docker
   become: true
   any_errors_fatal: true
-  gather_facts: false
   tasks:
     - include_tasks: ../tasks/docker_install.yaml
 
@@ -18,4 +17,4 @@
     default_container_image: ubuntu
     default_container_command: sleep 1
   tasks:
-    - include_tasks: ../tasks/docker_test.yaml
+    - include_tasks: ../tasks/docker_create_container.yaml
