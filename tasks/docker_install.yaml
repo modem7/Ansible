@@ -22,7 +22,6 @@
           - lsb-release
           - python3-setuptools
         state: present
-        update_cache: true
 
     - name: Ensure additional dependencies are installed (on Ubuntu < 20.04 and any other systems).
       package:
