@@ -1,3 +1,4 @@
 ---
     - name: Shutdown VMs
       community.general.shutdown:
+      no_log: true
