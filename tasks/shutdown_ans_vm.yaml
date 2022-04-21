@@ -1,0 +1,3 @@
+---
+    - name: Shutdown VMs
+      community.general.shutdown:
