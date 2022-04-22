@@ -1,0 +1,4 @@
+---
+#Run ansible-galaxy install -r requirements.yml in this directory to get the required Ansible roles.
+collections:
+  - name: community.general

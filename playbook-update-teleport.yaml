@@ -1,0 +1,46 @@
+---
+#Set Proxmox Variables
+- name: Set Variables
+  any_errors_fatal: true
+  gather_facts: false
+  hosts: proxmox
+  tasks:
+    - include_tasks: ../tasks/set_proxmox_vars.yaml
+
+#Boot up machines
+- name: Start Teleport
+  any_errors_fatal: true
+  gather_facts: false
+  hosts: proxmox
+  tasks:
+    - include_tasks: ../tasks/startup_teleport.yaml
+
+#Update Packages
+- name: Update VMs
+  any_errors_fatal: true
+  become: true
+  become_user: root
+  serial: 10
+  gather_facts: false
+  hosts: teleport
+  tasks:
+    - include_tasks: ../tasks/apt_upgrade.yaml
+
+# #Shutdown machines
+# - name: Stop Teleport
+  # any_errors_fatal: true
+  # gather_facts: false
+  # hosts: proxmox
+  # tasks:
+    # - include_tasks: ../tasks/shutdown_teleport.yaml
+
+#Shutdown machines
+- name: Shutdown VMs
+  any_errors_fatal: true
+  become: true
+  become_user: root
+  serial: 10
+  gather_facts: false
+  hosts: teleport
+  tasks:
+    - include_tasks: ../tasks/shutdown_ans_teleport.yaml
