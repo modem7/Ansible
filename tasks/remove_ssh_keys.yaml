@@ -1,0 +1,5 @@
+---
+    - name: Removing all stored SSH keys
+      local_action: "shell ssh-add -D"
+      changed_when: False
+      no_log: true

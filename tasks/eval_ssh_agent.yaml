@@ -1,0 +1,10 @@
+---
+    - name: Define SSH-Agent variables
+      local_action: shell eval "$(ssh-agent -s)"
+      changed_when: False
+      no_log: true
+
+    - name: Add SSH keys
+      local_action: "shell /home/modem7/ansible/bw_add_sshkeys.py"
+      changed_when: False
+      no_log: true
