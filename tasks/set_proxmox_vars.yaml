@@ -1,5 +1,5 @@
 ---
-# ansible-vault encrypt_string --vault-password-file password/password_file 'mypasswordhere' --name 'prox_pass'
+# ansible-vault encrypt_string --encrypt-vault-id prod 'mypasswordhere' --name 'prox_pass'
     - name: Set prox_user variable
       set_fact:
         prox_user: !vault |
