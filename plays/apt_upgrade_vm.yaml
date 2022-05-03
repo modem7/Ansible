@@ -14,7 +14,7 @@
   become: true
   become_user: root
   connection: local
-  serial: 10
+  serial: 20
   gather_facts: false
   hosts: VMnotele
   tasks:
@@ -41,7 +41,7 @@
   any_errors_fatal: true
   become: true
   become_user: root
-  serial: 10
+  serial: 20
   gather_facts: false
   hosts: VMnotele
   tasks:
@@ -60,7 +60,7 @@
   any_errors_fatal: true
   become: true
   become_user: root
-  serial: 10
+  serial: 20
   gather_facts: false
   hosts: VMnotele:!VMalwayson
   tasks:
@@ -80,7 +80,7 @@
   become: true
   become_user: root
   connection: local
-  serial: 10
+  serial: 20
   gather_facts: false
   hosts: VMnotele
   tasks:
