@@ -1,4 +1,5 @@
 @echo off
+rem Usage: Just drag and drop your encrypted file onto this script.
 rem https://www.bloggingforlogging.com/2018/05/20/decrypting-the-secrets-of-ansible-vault-in-powershell/
 rem the name of the script is drive path name of the Parameter %0
 rem (= the batch file) but with the extension ".ps1"
@@ -9,4 +10,4 @@ if '%1'=='' goto Done
 set args=%args%, %1
 goto More
 :Done
-powershell.exe -NoExit -Command "& 'Get-DecryptedAnsibleVault' -Path '%args%' | Set-Content -Path '%args%'"
+powershell.exe -Command "& 'Get-DecryptedAnsibleVault' -Path '%args%' | Set-Content -Path '%args%'"
