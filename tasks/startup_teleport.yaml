@@ -2,7 +2,8 @@
     - name: Proxmox start Teleport
       community.general.proxmox_kvm:
         api_user: "{{ prox_user }}"
-        api_password: "{{ prox_pass }}"
+        api_token_id: "{{ prox_token_id }}"
+        api_token_secret: "{{ prox_token_secret }}"
         api_host: "127.0.0.1"
         node: "proxmox"
         vmid: "{{ item }}"
