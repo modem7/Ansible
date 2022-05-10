@@ -3,9 +3,4 @@
     - name: Check if Docker is installed 
       tasks:
         - include_tasks: ../tasks/docker_install.yaml
-
-    - name: Install Docker
-      any_errors_fatal: true
-      tasks:
-        - include_tasks: ../tasks/docker_install.yaml
       when: docker_exists.rc != 0

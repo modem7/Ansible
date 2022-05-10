@@ -26,8 +26,7 @@
   gather_facts: true
   any_errors_fatal: true
   tasks:
-    - include_tasks: ../tasks/docker_install.yaml
-  when: docker_exists.rc != 0
+    - include_tasks: ../tasks/check_docker_installed.yaml
     
 # #Add SSH keys for root
 # - name: Add SSH Keys for root
