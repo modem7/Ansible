@@ -1,0 +1,33 @@
+---
+#Add SSH Keys for local
+- name: Add SSH Keys for local
+  any_errors_fatal: true
+  gather_facts: false
+  connection: local
+  hosts: proxmox
+  tasks:
+    - include_tasks: ../tasks/eval_ssh_agent.yaml
+
+#Add SSH keys for root
+- name: Add SSH Keys for root
+  any_errors_fatal: true
+  become: true
+  become_user: root
+  connection: local
+  serial: 10
+  gather_facts: false
+  hosts: docker
+  tasks:
+    - include_tasks: ../tasks/eval_ssh_agent.yaml
+
+- name: Install docker
+  hosts: "{{ setupHosts }}"
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  vars_prompt:
+    - name: "setupHosts"
+      prompt: "Which hosts would you like to setup?"
+      private: no
+  tasks:
+    - include_tasks: ../tasks/docker_install.yaml
