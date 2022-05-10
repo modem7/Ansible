@@ -16,7 +16,11 @@
   connection: local
   serial: 10
   gather_facts: false
-  hosts: docker
+  hosts: "{{ setupHosts }}"
+  vars_prompt:
+    - name: "setupHosts"
+      prompt: "Which hosts would you like to setup?"
+      private: no
   tasks:
     - include_tasks: ../tasks/eval_ssh_agent.yaml
 
