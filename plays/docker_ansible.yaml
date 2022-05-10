@@ -27,6 +27,29 @@
   any_errors_fatal: true
   tasks:
     - include_tasks: ../tasks/check_docker_installed.yaml
+  vars:
+    docker_compose_version: 1.29.2
+    docker_compose_path: /usr/local/bin/docker-compose
+
+#Remove SSH Keys for local
+- name: Remove SSH Keys for local
+  any_errors_fatal: true
+  gather_facts: false
+  hosts: proxmox
+  tasks:
+    - include_tasks: ../tasks/remove_ssh_keys.yaml
+
+#Remove SSH keys for root
+- name: Remove SSH Keys for root
+  any_errors_fatal: true
+  become: true
+  become_user: root
+  connection: local
+  serial: 20
+  gather_facts: false
+  hosts: docker-ansible-test
+  tasks:
+    - include_tasks: ../tasks/remove_ssh_keys.yaml
     
 # #Add SSH keys for root
 # - name: Add SSH Keys for root
