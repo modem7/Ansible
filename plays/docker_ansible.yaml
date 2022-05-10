@@ -26,7 +26,7 @@
   gather_facts: true
   any_errors_fatal: true
   tasks:
-    - include_tasks: ../tasks/check_docker_installed.yaml
+    - include_tasks: ../tasks/docker_install.yaml
   vars:
     docker_compose_version: 1.29.2
     docker_compose_path: /usr/local/bin/docker-compose
