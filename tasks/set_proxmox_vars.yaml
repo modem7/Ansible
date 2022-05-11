@@ -10,7 +10,7 @@
           3264346661356363310a653935363166363333656364653339653935366338353739306363323830
           6439
 
-    - name: Set prox_pass variable
+    - name: Set prox_token_id variable
       set_fact:
         prox_token_id: !vault |
           $ANSIBLE_VAULT;1.2;AES256;prod
@@ -20,7 +20,7 @@
           3461646362373630610a333465623163363364386338616132353534386436386465373862356336
           6263
 
-    - name: Set prox_pass variable
+    - name: Set prox_token_secret variable
       set_fact:
         prox_token_secret: !vault |
           $ANSIBLE_VAULT;1.2;AES256;prod
