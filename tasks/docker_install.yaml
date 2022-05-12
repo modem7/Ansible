@@ -38,7 +38,6 @@
               - virtualenv
               - lsb-release
               - python3-setuptools
-              - members
             state: present
 
         - name: Ensure additional dependencies are installed (on Ubuntu < 20.04 and any other systems).
@@ -69,7 +68,7 @@
 
         - name: De-Armor Docker GPG key
           shell: gpg --dearmor < /usr/share/keyrings/docker-archive-keyring.gpg_armored > /usr/share/keyrings/docker-archive-keyring.gpg
-          # no_log: true
+          no_log: true
           args:
             creates: /usr/share/keyrings/docker-archive-keyring.gpg
 
@@ -96,7 +95,12 @@
             state: present
 
         - name: Get list of users
-          shell: for i in $(members sudo); do echo "$i" ;done
+          shell: |
+            _l="/etc/login.defs"
+            _p="/etc/passwd"
+            l=$(grep "^UID_MIN" $_l)
+            l1=$(grep "^UID_MAX" $_l)
+            awk -F':' -v "min=${l##UID_MIN}" -v "max=${l1##UID_MAX}" '{ if ( $3 >= min && $3 <= max  && $7 != "/sbin/nologin" ) print $0 }' "$_p" | cut -d: -f1
           changed_when: false
           register: docker_users
 
