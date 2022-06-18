@@ -34,6 +34,8 @@
             lock_timeout: 120
           register: apt_result
           no_log: true
+          retries: 3
+          until: apt_result is success
 
         - name: Check and report if updates got installed
           shell: grep -A 30 "$(date +"%a, %b %Oe %Y")" /var/log/aptitude
