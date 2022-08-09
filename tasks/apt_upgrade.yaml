@@ -3,10 +3,10 @@
       wait_for_connection:
         timeout: 120
 
-    # - name: Wait for cloud-init / user-data to finish
-      # command: cloud-init status --wait
-      # changed_when: false
-      # no_log: true
+    - name: Wait for cloud-init / user-data to finish
+      command: cloud-init status --wait
+      changed_when: false
+      no_log: true
 
     - name: Gather all facts of cloud init
       community.general.cloud_init_data_facts:
