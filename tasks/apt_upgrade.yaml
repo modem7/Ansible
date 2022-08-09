@@ -3,10 +3,25 @@
       wait_for_connection:
         timeout: 120
 
-    - name: Wait for cloud-init / user-data to finish
-      command: cloud-init status --wait
-      changed_when: false
-      no_log: true
+    # - name: Wait for cloud-init / user-data to finish
+      # command: cloud-init status --wait
+      # changed_when: false
+      # no_log: true
+
+    - name: Gather all facts of cloud init
+      community.general.cloud_init_data_facts:
+      register: result
+
+    - ansible.builtin.debug:
+        var: result
+
+    - name: Wait for cloud init to finish
+      community.general.cloud_init_data_facts:
+        filter: status
+      register: res
+      until: "res.cloud_init_data_facts.status.v1.stage is defined and not res.cloud_init_data_facts.status.v1.stage"
+      retries: 50
+      delay: 5
 
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
       apt:
@@ -33,7 +48,7 @@
         - name: Upgrade all packages on servers
           apt:
             upgrade: yes
-            lock_timeout: 120
+            lock_timeout: 300
           register: apt_result
           no_log: true
           retries: 3
