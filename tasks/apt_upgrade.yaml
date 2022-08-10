@@ -8,13 +8,6 @@
       changed_when: false
       no_log: true
 
-    - name: Gather all facts of cloud init
-      community.general.cloud_init_data_facts:
-      register: result
-
-    - ansible.builtin.debug:
-        var: result
-
     - name: Wait for cloud init to finish
       community.general.cloud_init_data_facts:
         filter: status
