@@ -5,6 +5,6 @@
       no_log: true
 
     - name: Add SSH keys to SSH-Agent
-      local_action: "shell /home/modem7/ansible/bw_add_sshkeys.py"
+      local_action: "shell /home/modem7/ansible/bw_add_sshkeys.py -d"
       changed_when: False
       no_log: true
