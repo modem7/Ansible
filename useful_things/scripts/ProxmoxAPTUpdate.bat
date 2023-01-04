@@ -1,6 +1,26 @@
 @echo off
 set TERM=xterm
 title Proxmox
+
+:: Variables
+:: Proxmox Server
+set "proxserv=192.168.0.251"
+:: Ansible VM
+set "ansibleVM=192.168.50.102"
+:: Bitwarden command
+set "bwcommand=export BW_SESSION="$(bw unlock --raw)" && bw sync -f && eval "$(ssh-agent -s)"
+:: Aptitude update command
+set "aptupdate=sudo aptitude update && sudo aptitude safe-upgrade -y"
+:: Playbooks
+set "playbookteleport=plays/apt_upgrade_teleport.yaml"
+set "playbookvm=plays/apt_upgrade_vm.yaml"
+:: Location of QM on Proxmox
+set "qm_loc=/usr/sbin/qm"
+:: Users
+set "ans_loc=~/ansible"
+set "root_user=root"
+set "ans_user=modem7"
+
 :home
 cls
 echo.
@@ -37,17 +57,17 @@ goto home
 :startansible
 cls
 echo Starting Ansible VM
-ssh -t root@192.168.0.251 "sudo /usr/sbin/qm start 1102"
+ssh -t %root_user%@%proxserv% "sudo %qm_loc% start 1102"
 cls
-echo Waiting 15 seconds to allow bootup.
-TIMEOUT /T 15 /NOBREAK
+echo Waiting 30 seconds to allow bootup.
+TIMEOUT /T 30 /NOBREAK
 cls
 goto home
 
 :checkstatus
 cls
 echo Checking VM status
-ssh -t root@192.168.0.251 "sudo /usr/sbin/qm list"
+ssh -t %root_user%@%proxserv% "sudo %qm_loc% list"
 pause
 cls
 goto home
@@ -55,14 +75,15 @@ goto home
 :updatevms
 cls
 echo Updating Non-Teleport VMs.
-ssh -t modem7@192.168.50.102 "cd ~/ansible && export BW_SESSION="$(bw unlock --raw)" && bw sync -f && eval "$(ssh-agent -s)" && ansible-playbook plays/apt_upgrade_vm.yaml"
+ssh -t %ans_user%@%ansibleVM% "cd %ans_loc% && %bwcommand%" && ansible-playbook %playbookvm%"
+pause
 cls
 goto home
 
 :updateteleport
 cls
 echo Updating Teleport VMs.
-ssh -t modem7@192.168.50.102 "cd ~/ansible && export BW_SESSION="$(bw unlock --raw)" && bw sync -f && eval "$(ssh-agent -s)" && ansible-playbook plays/apt_upgrade_teleport.yaml"
+ssh -t %ans_user%@%ansibleVM% "cd %ans_loc% && %bwcommand%" && ansible-playbook %playbookteleport%"
 pause
 cls
 goto home
@@ -70,7 +91,7 @@ goto home
 :updateansible
 cls
 echo Updating Ansible VM
-ssh -t modem7@192.168.50.102 "sudo aptitude update && sudo aptitude safe-upgrade -y"
+ssh -t %ans_user%@%ansibleVM% "%aptupdate%"
 cls
 goto home
 
@@ -79,32 +100,36 @@ cls
 echo Updating Everything - Ansible VM won't shut down.
 echo.
 echo Updating Teleport and Non-Teleport VMs.
-ssh -t modem7@192.168.50.102 "cd ~/ansible && export BW_SESSION="$(bw unlock --raw)" && bw sync -f && eval "$(ssh-agent -s)" && ansible-playbook plays/apt_upgrade_teleport.yaml plays/apt_upgrade_vm.yaml"
+ssh -t %ans_user%@%ansibleVM% "cd %ans_loc% && %bwcommand%" && ansible-playbook %playbookteleport% %playbookvm%"
 cls
 echo Updating Ansible VM
-ssh -t modem7@192.168.50.102 "sudo aptitude update && sudo aptitude safe-upgrade -y"
+ssh -t %ans_user%@%ansibleVM% "%aptupdate%"
 cls
 goto home
 
 :fullyautomated
 cls
+
 echo Updating Everything
 echo.
+
 echo Starting Ansible VM
-ssh -t root@192.168.0.251 "sudo /usr/sbin/qm start 1102"
+ssh -t %root_user%@%proxserv% "sudo %qm_loc% start 1102"
 cls
-echo Waiting 15 seconds to allow bootup.
-rem TIMEOUT /T 15 /NOBREAK
-TIMEOUT /T 15
+
+echo Waiting 30 seconds to allow bootup.
+:: TIMEOUT /T 30 /NOBREAK
+TIMEOUT /T 30
 cls
+
 echo Updating Teleport and Non-Teleport VMs.
-ssh -t modem7@192.168.50.102 "cd ~/ansible && export BW_SESSION="$(bw unlock --raw)" && bw sync -f && eval "$(ssh-agent -s)" && ansible-playbook plays/apt_upgrade_teleport.yaml plays/apt_upgrade_vm.yaml"
+ssh -t %ans_user%@%ansibleVM% "cd %ans_loc% && %bwcommand%" && ansible-playbook %playbookteleport% %playbookvm%"
 
 echo Updating Ansible VM
-ssh -t modem7@192.168.50.102 "sudo aptitude update && sudo aptitude safe-upgrade -y"
+ssh -t %ans_user%@%ansibleVM% "%aptupdate%"
 
 echo Shutting down Ansible VM
-ssh -t root@192.168.0.251 "sudo /usr/sbin/qm shutdown 1102"
+ssh -t %ans_user%@%ansibleVM% "sudo shutdown now"
 echo.
 echo.
 
@@ -114,14 +139,14 @@ goto home
 :shutdownansible
 cls
 echo Shutting down Ansible VM
-ssh -t root@192.168.0.251 "sudo /usr/sbin/qm shutdown 1102"
+ssh -t %ans_user%@%ansibleVM% "sudo shutdown now"
 cls
 goto home
 
 :gitpull
 cls
 echo Pulling latest Git
-ssh -t modem7@192.168.50.102 "cd ~/ansible && git pull"
+ssh -t %ans_user%@%ansibleVM% "cd %ans_loc% && git pull"
 pause
 cls
 goto home
