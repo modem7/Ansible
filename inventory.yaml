@@ -93,13 +93,16 @@ VM:
     pihole:
     templates:
     borgmatic:
+    packerserver:
 
 VMnotele:
   children:
     pihole:
     templates:
     borgmatic:
+    packerserver:
 
 VMalwayson:
   children:
     pihole:
+    packerserver:
