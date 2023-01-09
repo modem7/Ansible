@@ -39,7 +39,7 @@ teleport:
       ansible_user: ansible
       ansible_port: 32264
 
-packer-server:
+packerserver:
   hosts:
     Packer:
       ansible_host: 192.168.0.100
@@ -69,7 +69,7 @@ hda:
   vars:
     ansible_ssh_user: ansible
 
-borgmatic-vm:
+borgmaticvm:
   hosts:
     Borgmatic:
       ansible_host: 192.168.50.110
