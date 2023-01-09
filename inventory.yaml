@@ -39,9 +39,9 @@ teleport:
       ansible_user: ansible
       ansible_port: 32264
 
-packer:
+packer-server:
   hosts:
-    packer-server:
+    Packer:
       ansible_host: 192.168.0.100
   vars:
     ansible_ssh_user: ansible
@@ -55,9 +55,9 @@ proxmox:
 
 pihole:
   hosts:
-    pihole-master:
+    NTPPihole-Docker-Master:
       ansible_host: 192.168.50.104
-    pihole-slave:
+    NTPPihole-Docker-Slave:
       ansible_host: 192.168.50.105
   vars:
     ansible_ssh_user: ansible
@@ -69,16 +69,16 @@ hda:
   vars:
     ansible_ssh_user: ansible
 
-borgmatic:
+borgmatic-vm:
   hosts:
-    borgmatic-vm:
+    Borgmatic:
       ansible_host: 192.168.50.110
   vars:
     ansible_ssh_user: ansible
 
 templates:
   hosts:
-    ubuntu-desktop-template:
+    ubuntu-desktop-cloud-master:
       ansible_host: 192.168.50.152
     ubuntu2204-cloud-master:
       ansible_host: 192.168.50.154
@@ -91,16 +91,12 @@ VM:
   children:
     teleport:
     pihole:
-    hda:
-    terraform:
     templates:
     borgmatic:
 
 VMnotele:
   children:
     pihole:
-    hda:
-    terraform:
     templates:
     borgmatic:
 

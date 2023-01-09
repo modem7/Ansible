@@ -1,4 +1,0 @@
----
-    - name: Shutdown Teleport
-      community.general.shutdown:
-      no_log: true

@@ -1,5 +1,5 @@
 ---
-#Add SSH Keys for local
+# Add SSH Keys for Proxmox
 - name: Add SSH Keys for Proxmox
   any_errors_fatal: true
   gather_facts: false
@@ -8,7 +8,7 @@
   tasks:
     - include_tasks: ../tasks/eval_ssh_agent.yaml
 
-#Add SSH keys for root
+# Add SSH keys for root
 - name: Add SSH Keys for VMs
   any_errors_fatal: true
   become: true
@@ -20,7 +20,7 @@
   tasks:
     - include_tasks: ../tasks/eval_ssh_agent.yaml
 
-#Set Proxmox Variables
+# Set Proxmox Variables
 - name: Set Variables
   any_errors_fatal: true
   gather_facts: false
@@ -28,15 +28,15 @@
   tasks:
     - include_tasks: ../tasks/set_proxmox_vars.yaml
 
-#Boot up machines
+# Boot up machines
 - name: Start Teleport
-  any_errors_fatal: false
+  any_errors_fatal: true
   gather_facts: false
   hosts: teleport
   tasks:
-    - include_tasks: ../tasks/startup_teleport.yaml
+    - include_tasks: ../tasks/startup_vm.yaml
 
-#Update Packages
+# Update Packages
 - name: Update VMs
   any_errors_fatal: true
   become: true
@@ -46,18 +46,17 @@
   tasks:
     - include_tasks: ../tasks/apt_upgrade.yaml
 
-#Shutdown machines
+# Shutdown machines
 - name: Shutdown VMs
   any_errors_fatal: true
   become: true
   become_user: root
-  serial: 10
   gather_facts: false
   hosts: teleport
   tasks:
-    - include_tasks: ../tasks/shutdown_ans_teleport.yaml
+    - include_tasks: ../tasks/shutdown_ans_vm.yaml
 
-#Remove SSH Keys for Proxmox
+# Remove SSH Keys for Proxmox
 - name: Remove SSH Keys for Proxmox
   any_errors_fatal: true
   gather_facts: false
@@ -65,13 +64,12 @@
   tasks:
     - include_tasks: ../tasks/remove_ssh_keys.yaml
 
-#Remove SSH keys for root
+# Remove SSH keys for root
 - name: Remove SSH Keys for VMs
   any_errors_fatal: true
   become: true
   become_user: root
   connection: local
-  serial: 10
   gather_facts: false
   hosts: teleport
   tasks:

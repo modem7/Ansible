@@ -4,19 +4,8 @@
         api_user: "{{ prox_user }}"
         api_token_id: "{{ prox_token_id }}"
         api_token_secret: "{{ prox_token_secret }}"
-        api_host: "127.0.0.1"
+        api_host: "192.168.0.251"
         node: "proxmox"
-        vmid: "{{ item }}"
+        name: "{{ inventory_hostname }}"
         state: "started"
-      loop:
-        - 1100
-        # - 1103 # Used for Bastion
-        - 1104
-        - 1105
-        - 1110
-        - 1254
-        # - 9000
-        - 9001
-        # - 9002
-        - 9005
-        - 9006
+      delegate_to: localhost
