@@ -1,18 +1,11 @@
 ---
-    - name: Proxmox start Teleport
+    - name: Proxmox start VMs
       community.general.proxmox_kvm:
         api_user: "{{ prox_user }}"
         api_token_id: "{{ prox_token_id }}"
         api_token_secret: "{{ prox_token_secret }}"
-        api_host: "127.0.0.1"
+        api_host: "192.168.0.251"
         node: "proxmox"
-        vmid: "{{ item }}"
+        name: "{{ inventory_hostname }}"
         state: "started"
-      loop:
-        - 1107
-        - 1108
-        - 1109
-        # - 1110
-        # - 1111
-        # - 1112
-        # - 1113
+      delegate_to: localhost

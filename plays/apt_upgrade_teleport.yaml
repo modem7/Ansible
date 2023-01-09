@@ -1,6 +1,6 @@
 ---
 #Add SSH Keys for local
-- name: Add SSH Keys for local
+- name: Add SSH Keys for Proxmox
   any_errors_fatal: true
   gather_facts: false
   connection: local
@@ -9,7 +9,7 @@
     - include_tasks: ../tasks/eval_ssh_agent.yaml
 
 #Add SSH keys for root
-- name: Add SSH Keys for root
+- name: Add SSH Keys for VMs
   any_errors_fatal: true
   become: true
   become_user: root
@@ -24,15 +24,15 @@
 - name: Set Variables
   any_errors_fatal: true
   gather_facts: false
-  hosts: proxmox
+  hosts: teleport
   tasks:
     - include_tasks: ../tasks/set_proxmox_vars.yaml
 
 #Boot up machines
 - name: Start Teleport
-  any_errors_fatal: true
+  any_errors_fatal: false
   gather_facts: false
-  hosts: proxmox
+  hosts: teleport
   tasks:
     - include_tasks: ../tasks/startup_teleport.yaml
 
@@ -57,8 +57,8 @@
   tasks:
     - include_tasks: ../tasks/shutdown_ans_teleport.yaml
 
-#Remove SSH Keys for local
-- name: Remove SSH Keys for local
+#Remove SSH Keys for Proxmox
+- name: Remove SSH Keys for Proxmox
   any_errors_fatal: true
   gather_facts: false
   hosts: proxmox
@@ -66,7 +66,7 @@
     - include_tasks: ../tasks/remove_ssh_keys.yaml
 
 #Remove SSH keys for root
-- name: Remove SSH Keys for root
+- name: Remove SSH Keys for VMs
   any_errors_fatal: true
   become: true
   become_user: root
