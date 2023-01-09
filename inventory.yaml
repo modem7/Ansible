@@ -42,7 +42,7 @@ teleport:
 packerserver:
   hosts:
     Packer:
-      ansible_host: 192.168.0.100
+      ansible_host: 192.168.50.100
   vars:
     ansible_ssh_user: ansible
 
