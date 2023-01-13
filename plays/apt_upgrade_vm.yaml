@@ -71,6 +71,6 @@
   become_user: root
   connection: local
   gather_facts: false
-  hosts: teleport
+  hosts: VMnotele
   tasks:
     - include_tasks: ../tasks/remove_ssh_keys.yaml
