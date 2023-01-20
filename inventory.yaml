@@ -92,14 +92,14 @@ VM:
     teleport:
     pihole:
     templates:
-    borgmatic:
+    borgmaticvm:
     packerserver:
 
 VMnotele:
   children:
     pihole:
     templates:
-    borgmatic:
+    borgmaticvm:
     packerserver:
 
 VMalwayson:
