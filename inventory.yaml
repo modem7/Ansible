@@ -105,4 +105,3 @@ VMnotele:
 VMalwayson:
   children:
     pihole:
-    packerserver:
