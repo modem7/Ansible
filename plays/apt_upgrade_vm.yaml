@@ -36,7 +36,7 @@
   tasks:
     - include_tasks: ../tasks/startup_vm.yaml
 
-#Update Packages
+# Update Packages
 - name: Update VMs
   any_errors_fatal: true
   become: true
@@ -45,6 +45,16 @@
   hosts: VMnotele
   tasks:
     - include_tasks: ../tasks/apt_upgrade.yaml
+
+# Run FSTrim
+- name: Run FSTrim
+  any_errors_fatal: true
+  become: true
+  serial: 20
+  gather_facts: false
+  hosts: VMnotele
+  tasks:
+    - include_tasks: ../tasks/run_fstrim.yaml
 
 # Shutdown machines
 - name: Shutdown VMs

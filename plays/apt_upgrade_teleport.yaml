@@ -46,6 +46,16 @@
   tasks:
     - include_tasks: ../tasks/apt_upgrade.yaml
 
+# Run FSTrim
+- name: Run FSTrim
+  any_errors_fatal: true
+  become: true
+  serial: 10
+  gather_facts: false
+  hosts: teleport
+  tasks:
+    - include_tasks: ../tasks/run_fstrim.yaml
+
 # Shutdown machines
 - name: Shutdown VMs
   any_errors_fatal: true
