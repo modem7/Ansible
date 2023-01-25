@@ -20,51 +20,24 @@
   tasks:
     - include_tasks: ../tasks/eval_ssh_agent.yaml
 
-# Set Proxmox Variables
-- name: Set Variables
-  any_errors_fatal: true
-  gather_facts: false
-  hosts: teleport
-  tasks:
-    - include_tasks: ../tasks/set_proxmox_vars.yaml
-
-# Boot up machines
-- name: Start Teleport
-  any_errors_fatal: true
-  gather_facts: false
-  hosts: teleport
-  tasks:
-    - include_tasks: ../tasks/startup_vm.yaml
-
-# Update Packages
+# Main tasks
 - name: Update VMs
   any_errors_fatal: true
+  gather_facts: false
   become: true
   serial: 10
-  gather_facts: false
   hosts: teleport
   tasks:
-    - include_tasks: ../tasks/apt_upgrade.yaml
-
-# Run FSTrim
-- name: Run FSTrim
-  any_errors_fatal: true
-  become: true
-  serial: 10
-  gather_facts: false
-  hosts: teleport
-  tasks:
-    - include_tasks: ../tasks/run_fstrim.yaml
-
-# Shutdown machines
-- name: Shutdown VMs
-  any_errors_fatal: true
-  become: true
-  become_user: root
-  gather_facts: false
-  hosts: teleport
-  tasks:
-    - include_tasks: ../tasks/shutdown_ans_vm.yaml
+    - name: Set Proxmox Variables
+      include_tasks: ../tasks/set_proxmox_vars.yaml
+    - name: Startup VMs
+      include_tasks: ../tasks/startup_vm.yaml
+    - name: Update Packages
+      include_tasks: ../tasks/apt_upgrade.yaml
+    - name: Run FSTrim
+      include_tasks: ../tasks/run_fstrim.yaml
+    - name: Shutdown VMs
+      include_tasks: ../tasks/shutdown_ans_vm.yaml
 
 # Remove SSH Keys for Proxmox
 - name: Remove SSH Keys for Proxmox
