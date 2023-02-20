@@ -81,9 +81,9 @@ templates:
     ubuntu-desktop-cloud-master:
       ansible_host: 192.168.50.152
     ubuntu2204-cloud-master:
-      ansible_host: 192.168.50.154
+      ansible_host: 192.168.50.153
     ubuntu2204-cloud-master-extras:
-      ansible_host: 192.168.50.155
+      ansible_host: 192.168.50.154
   vars:
     ansible_ssh_user: ansible
 
