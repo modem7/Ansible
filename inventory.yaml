@@ -46,6 +46,13 @@ packerserver:
   vars:
     ansible_ssh_user: ansible
 
+hdaserver:
+  hosts:
+    HDA-Prep:
+      ansible_host: 192.168.50.254
+  vars:
+    ansible_ssh_user: ansible
+
 proxmox:
   hosts:
     proxmox-lab:
