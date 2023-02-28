@@ -101,6 +101,7 @@ VM:
     templates:
     borgmaticvm:
     packerserver:
+    hdaserver:
 
 VMnotele:
   children:
@@ -108,6 +109,7 @@ VMnotele:
     templates:
     borgmaticvm:
     packerserver:
+    hdaserver:
 
 VMalwayson:
   children:
