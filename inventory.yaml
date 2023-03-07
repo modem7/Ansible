@@ -69,6 +69,16 @@ pihole:
   vars:
     ansible_ssh_user: ansible
 
+lxc:
+  hosts:
+    APTCacher-NG:
+      ansible_host: 192.168.50.101
+    Bastion:
+      ansible_host: 192.168.50.103
+      ansible_port: 32264
+  vars:
+    ansible_ssh_user: ansible
+
 hda:
   hosts:
     hda-migrate-vm:
@@ -102,6 +112,11 @@ VM:
     borgmaticvm:
     packerserver:
     hdaserver:
+    lxc:
+
+CT:
+  children:
+    lxc:
 
 VMnotele:
   children:
@@ -110,7 +125,9 @@ VMnotele:
     borgmaticvm:
     packerserver:
     hdaserver:
+    lxc:
 
 VMalwayson:
   children:
     pihole:
+    lxc:

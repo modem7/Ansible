@@ -36,6 +36,8 @@
       include_tasks: ../tasks/apt_upgrade.yaml
     - name: Run FSTrim
       include_tasks: ../tasks/run_fstrim.yaml
+      when:
+        - inventory_hostname not in groups.CT
     - name: Shutdown VMs
       include_tasks: ../tasks/shutdown_ans_vm.yaml
       when:
