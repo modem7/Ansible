@@ -22,7 +22,7 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600
-        autoclean: yes
+        clean: yes
 
     - name: Collect packages to upgrade
       shell: aptitude -q -F%p --disable-columns search ~U
