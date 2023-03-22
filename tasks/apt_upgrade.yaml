@@ -23,6 +23,8 @@
         update_cache: yes
         cache_valid_time: 3600
         clean: yes
+      retries: 5
+      delay: 5
 
     - name: Collect packages to upgrade
       shell: aptitude -q -F%p --disable-columns search ~U
@@ -46,7 +48,8 @@
             lock_timeout: 300
           register: apt_result
           no_log: true
-          retries: 3
+          retries: 10
+          delay: 10
           until: apt_result is success
 
         - name: Check and report if updates got installed
