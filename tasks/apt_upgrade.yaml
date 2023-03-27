@@ -48,7 +48,7 @@
             lock_timeout: 300
           register: apt_result
           no_log: true
-          retries: 10
+          retries: 30
           delay: 10
           until: apt_result is success
 
