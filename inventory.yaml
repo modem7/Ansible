@@ -48,7 +48,7 @@ packerserver:
 
 hdaserver:
   hosts:
-    HDA-Prep:
+    HDA:
       ansible_host: 192.168.50.254
   vars:
     ansible_ssh_user: ansible
