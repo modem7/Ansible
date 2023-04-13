@@ -16,7 +16,7 @@
   connection: local
   serial: 20
   gather_facts: false
-  hosts: VMnotele
+  hosts: VMnotele,teleport
   tasks:
     - include_tasks: ../tasks/eval_ssh_agent.yaml
 
@@ -26,7 +26,7 @@
   gather_facts: false
   become: true
   serial: 20
-  hosts: VMnotele
+  hosts: VMnotele,teleport
   tasks:
     - name: Set Proxmox Variables
       include_tasks: ../tasks/set_proxmox_vars.yaml
@@ -58,6 +58,6 @@
   become_user: root
   connection: local
   gather_facts: false
-  hosts: VMnotele
+  hosts: VMnotele,teleport
   tasks:
     - include_tasks: ../tasks/remove_ssh_keys.yaml
