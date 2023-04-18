@@ -79,13 +79,6 @@ lxc:
   vars:
     ansible_ssh_user: ansible
 
-hda:
-  hosts:
-    hda-migrate-vm:
-      ansible_host: 192.168.50.254
-  vars:
-    ansible_ssh_user: ansible
-
 borgmaticvm:
   hosts:
     Borgmatic:
@@ -131,3 +124,4 @@ VMalwayson:
   children:
     pihole:
     lxc:
+    hdaserver:
