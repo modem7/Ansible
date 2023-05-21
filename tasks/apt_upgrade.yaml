@@ -5,7 +5,7 @@
 
     - name: Wait for cloud-init / user-data to finish
       command: cloud-init status --wait
-      when: 'lxc' not in group_names
+      when: "'lxc' not in group_names"
       changed_when: false
       no_log: true
 
@@ -14,7 +14,7 @@
         filter: status
       register: res
       until: "res.cloud_init_data_facts.status.v1.stage is defined and not res.cloud_init_data_facts.status.v1.stage"
-      when: 'lxc' not in group_names
+      when: "'lxc' not in group_names"
       retries: 50
       delay: 5
 
