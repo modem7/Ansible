@@ -5,7 +5,7 @@
 
     - name: Wait for cloud-init / user-data to finish
       command: cloud-init status --wait
-      when: inventory_hostname != "Bastion" and inventory_hostname != "APTCacher-NG"
+      when: 'lxc' not in group_names
       changed_when: false
       no_log: true
 
