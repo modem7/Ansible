@@ -22,7 +22,7 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600
-        clean: yes
+        clean: no
       retries: 5
       delay: 5
 
