@@ -117,6 +117,7 @@ VM:
     packerserver:
     hdaserver:
     lxc:
+    tdarrserver:
 
 CT:
   children:
@@ -130,6 +131,7 @@ VMnotele:
     packerserver:
     hdaserver:
     lxc:
+    tdarrserver:
 
 VMalwayson:
   children:
