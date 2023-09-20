@@ -140,3 +140,4 @@ VMalwayson:
     pihole:
     lxc:
     hdaserver:
+    tdarrserver:
