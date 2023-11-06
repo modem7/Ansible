@@ -17,12 +17,20 @@
       when: "'lxc' not in group_names"
       retries: 50
       delay: 5
+    
+    - name: Wait for unattended upgrade to finish
+      raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+
+    - name: Remove apt lock file
+      file:
+        state: absent
+        path: "/var/lib/dpkg/lock-frontend"
 
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
       apt:
         update_cache: yes
         cache_valid_time: 3600
-        clean: no
+        lock_timeout: 300
       retries: 5
       delay: 5
 
