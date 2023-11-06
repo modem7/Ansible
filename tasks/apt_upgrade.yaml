@@ -9,7 +9,7 @@
       changed_when: false
       no_log: true
 
-    - name: Wait for cloud init to finish
+    - name: Wait for cloud-init to finish
       community.general.cloud_init_data_facts:
         filter: status
       register: res
@@ -20,11 +20,13 @@
     
     - name: Wait for unattended upgrade to finish
       raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+      no_log: true
 
     - name: Remove apt lock file
       file:
         state: absent
         path: "/var/lib/dpkg/lock-frontend"
+      no_log: true
 
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
       apt:
