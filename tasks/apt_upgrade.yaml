@@ -22,11 +22,16 @@
       raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
       no_log: true
 
-    - name: Remove apt lock file
+    - name: Remove dpkg lock file
       file:
         state: absent
         path: "/var/lib/dpkg/lock-frontend"
       no_log: true
+
+    - name: Remove apt lock file
+      file:
+        state: absent
+        path: "/var/lib/dpkg/lock"
 
     - name: Update aptitude repo and cache on all Debian/Ubuntu boxes
       apt:
