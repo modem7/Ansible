@@ -20,6 +20,7 @@
     
     - name: Wait for unattended upgrade to finish
       raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+      when: "'lxc' not in group_names"
       no_log: true
 
     - name: Remove dpkg lock file
