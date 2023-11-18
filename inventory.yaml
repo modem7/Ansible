@@ -154,6 +154,8 @@ VMnotele:
     hdaserver:
     lxc:
     tdarrserver:
+    hishtoryserver:
+    zabbixserver:
 
 VMalwayson:
   children:
