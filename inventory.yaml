@@ -138,6 +138,8 @@ VM:
     hdaserver:
     lxc:
     tdarrserver:
+    hishtoryserver:
+    zabbixserver:
 
 CT:
   children:
