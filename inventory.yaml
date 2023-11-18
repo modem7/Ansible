@@ -60,6 +60,20 @@ tdarrserver:
   vars:
     ansible_ssh_user: ansible
 
+hishtoryserver:
+  hosts:
+    Hishtory:
+      ansible_host: 192.168.50.120
+  vars:
+    ansible_ssh_user: ansible
+
+zabbixserver:
+  hosts:
+    Zabbix:
+      ansible_host: 192.168.50.121
+  vars:
+    ansible_ssh_user: ansible
+
 proxmox:
   hosts:
     proxmox-lab:
