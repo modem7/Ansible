@@ -20,7 +20,6 @@
   any_errors_fatal: true
   become: true
   become_user: root
-  serial: 10
   gather_facts: false
   hosts: VMnotele
   tasks:
@@ -39,7 +38,6 @@
   any_errors_fatal: true
   become: true
   become_user: root
-  serial: 10
   gather_facts: false
   hosts: VMnotele:!VMalwayson
   tasks:
