@@ -14,7 +14,6 @@
   become: true
   become_user: root
   connection: local
-  serial: 10
   gather_facts: false
   hosts: teleport
   tasks:
@@ -25,7 +24,6 @@
   any_errors_fatal: true
   gather_facts: false
   become: true
-  serial: 10
   hosts: teleport
   tasks:
     - name: Set Proxmox Variables
