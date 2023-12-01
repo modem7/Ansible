@@ -25,20 +25,6 @@ dockertest:
   vars:
     ansible_ssh_user: ansible
 
-teleport:
-  hosts:
-    TeleportServer:
-      ansible_host: 192.168.50.107
-      ansible_user: ansible
-    Bastion-Test1:
-      ansible_host: 192.168.50.108
-      ansible_user: ansible
-      ansible_port: 32264
-    Bastion-Test2:
-      ansible_host: 192.168.50.109
-      ansible_user: ansible
-      ansible_port: 32264
-
 packerserver:
   hosts:
     Packer:
@@ -116,7 +102,6 @@ templates:
 
 VM:
   children:
-    teleport:
     pihole:
     templates:
     borgmaticvm:
@@ -124,8 +109,6 @@ VM:
     hdaserver:
     lxc:
     tdarrserver:
-    hishtoryserver:
-    zabbixserver:
 
 CT:
   children:
@@ -140,8 +123,6 @@ VMnotele:
     hdaserver:
     lxc:
     tdarrserver:
-    hishtoryserver:
-    zabbixserver:
 
 VMalwayson:
   children:
