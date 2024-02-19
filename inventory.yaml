@@ -79,8 +79,8 @@ lxc:
       ansible_host: 192.168.50.117
     PiAlert:
       ansible_host: 192.168.0.118
-    Hyperion-NG:
-      ansible_host: 192.168.30.154
+    # Hyperion-NG:
+      # ansible_host: 192.168.30.154
   vars:
     ansible_ssh_user: ansible
 
