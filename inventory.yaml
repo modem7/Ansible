@@ -73,8 +73,10 @@ lxc:
       ansible_host: 192.168.50.106
     HA-Proxy:
       ansible_host: 192.168.50.112
-    OliveTin:
-      ansible_host: 192.168.50.113
+      vmid: 1112
+    HA-Proxy:
+      ansible_host: 192.168.50.114
+      vmid: 1114
     NTFY:
       ansible_host: 192.168.50.117
     PiAlert:
