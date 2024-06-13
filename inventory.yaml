@@ -111,7 +111,6 @@ VM:
     borgmaticvm:
     packerserver:
     hdaserver:
-    lxc:
     tdarrserver:
 
 CT:
@@ -125,12 +124,10 @@ VMnotele:
     borgmaticvm:
     packerserver:
     hdaserver:
-    lxc:
     tdarrserver:
 
 VMalwayson:
   children:
     pihole:
-    lxc:
     hdaserver:
     tdarrserver:
