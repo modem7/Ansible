@@ -1,6 +1,6 @@
 ---
     - name: Proxmox start VMs
-      community.general.proxmox_kvm:
+      community.general.proxmox:
         api_user: "{{ prox_user }}"
         api_token_id: "{{ prox_token_id }}"
         api_token_secret: "{{ prox_token_secret }}"
